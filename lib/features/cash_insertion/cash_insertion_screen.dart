@@ -1,5 +1,6 @@
 import 'package:cash_withdrawer/data/db/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/models/notes_model.dart';
 
@@ -13,16 +14,26 @@ class CashInsertionScreen extends StatefulWidget {
 }
 
 class _CashInsertionScreenState extends State<CashInsertionScreen> {
- /* DatabaseHelper databaseHelper = DatabaseHelper();
+  DatabaseHelper? databaseHelper;
+  /* DatabaseHelper databaseHelper = DatabaseHelper();
   List<NotesModel> noteModel =[];*/
-  TextEditingController hundredRupeeNoteCountController = TextEditingController();
-  TextEditingController twoHundredRupeeNoteCountController = TextEditingController();
+  TextEditingController hundredRupeeNoteCountController =
+      TextEditingController();
+  TextEditingController twoHundredRupeeNoteCountController =
+      TextEditingController();
+  TextEditingController fiveHundredRupeeNoteCountController =
+      TextEditingController();
+  TextEditingController thousandRupeeNoteCountController =
+      TextEditingController();
+  TextEditingController twoThousandRupeeNoteCountController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // databaseHelper = DatabaseHelper(); // Initialize in initState
+    databaseHelper = DatabaseHelper();
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -47,11 +58,11 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Card(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 18.0, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18.0, vertical: 3),
                     child: Column(
                       children: [
-                         Row(
+                        Row(
                           children: [
                             const Text(
                               '₹100   *  ',
@@ -59,10 +70,17 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                             ),
                             Expanded(
                               child: TextField(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(5),
+                                ],
                                 controller: hundredRupeeNoteCountController,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    const InputDecoration(hintText: 'Enter value'),
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter value',
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.normal)),
                               ),
                             ),
                           ],
@@ -73,56 +91,101 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             Expanded(
                               child: TextField(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(5),
+                                ],
                                 controller: twoHundredRupeeNoteCountController,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    const InputDecoration(hintText: 'Enter value'),
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter value',
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.normal)),
                               ),
                             ),
                           ],
                         ),
-                        const Row(
+                        Row(
                           children: [
-                            Text('₹500   *  ',
+                            const Text('₹500   *  ',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             Expanded(
                               child: TextField(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(5),
+                                ],
+                                controller: fiveHundredRupeeNoteCountController,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    InputDecoration(hintText: 'Enter value'),
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter value',
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.normal)),
                               ),
                             ),
                           ],
                         ),
-                        const Row(
+                        Row(
                           children: [
-                            Text('₹1000 *  ',
+                            const Text('₹1000 *  ',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             Expanded(
                               child: TextField(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(5),
+                                ],
+                                controller: thousandRupeeNoteCountController,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    InputDecoration(hintText: 'Enter value'),
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter value',
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.normal)),
                               ),
                             ),
                           ],
                         ),
-                        const Row(
+                        Row(
                           children: [
-                            Text('₹2000 *  ',
+                            const Text('₹2000 *  ',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             Expanded(
                               child: TextField(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(5),
+                                ],
+                                controller: twoThousandRupeeNoteCountController,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    InputDecoration(hintText: 'Enter value'),
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter value',
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.normal)),
                               ),
                             ),
                           ],
                         ),
-                        ElevatedButton(onPressed: () {
-                          // _add();
-                        }, child: const Text('Add'))
+                        ElevatedButton(
+                            onPressed: () {
+                              databaseHelper!
+                                  .insert(CashModel(
+                                      hundredRupeeNoteCount: 2,
+                                      twoHundredRupeeNoteCount: 0,
+                                      fiveHundredRupeeNoteCount: 2,
+                                      thousandRupeeNoteCount: 1,
+                                      twoThousandRupeeNoteCount: 3))
+                                  .then((value) {
+                                print('data added');
+                              }).onError((error, stackTrace) {
+                                print(error.toString());
+                              });
+                              // _add();
+                            },
+                            child: const Text('Add'))
                       ],
                     ),
                   ),
@@ -162,15 +225,10 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
   }*/
 
   void _showAlertDialog(String title, String message) {
-
     AlertDialog alertDialog = AlertDialog(
       title: Text(title),
       content: Text(message),
     );
-    showDialog(
-        context: context,
-        builder: (_) => alertDialog
-    );
+    showDialog(context: context, builder: (_) => alertDialog);
   }
-
 }
