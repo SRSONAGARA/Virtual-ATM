@@ -14,7 +14,11 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Withdraw Money'),
+          title: const Text(
+            'Withdraw Money',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.blueGrey,
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -82,7 +86,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                 ),
               ),
               const Divider(),
-
               const Expanded(
                 flex: 4,
                 child: Text(

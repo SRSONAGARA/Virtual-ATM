@@ -1,3 +1,4 @@
+import 'package:cash_withdrawer/features/cashTable/cashTable.dart';
 import 'package:flutter/cupertino.dart';
 import '../../features/cash_insertion/cash_insertion_screen.dart';
 import '../../features/cash_withdraw/cash_withdraw_screen.dart';
@@ -8,5 +9,6 @@ class AppRoutes {
     DashboardScreen.routeName: (_)=> const DashboardScreen(),
     CashInsertionScreen.routeName: (_)=> const CashInsertionScreen(),
     CashWithdrawScreen.routeName: (_)=> const CashWithdrawScreen(),
+    CashTable.routeName: (_)=> const CashTable(),
   };
 }
