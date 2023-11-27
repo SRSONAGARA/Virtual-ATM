@@ -26,7 +26,7 @@ class DatabaseHelper {
 
   _onCreate(Database database, int version) async {
     await database.execute(
-        "CREATE TABLE cash (id INTEGER PRIMARY KEY AUTOINCREMENT, hundredRupeeNoteCount INTEGER, twoHundredRupeeNoteCount INTEGER, fiveHundredRupeeNoteCount INTEGER, thousandRupeeNoteCount INTEGER, twoThousandRupeeNoteCount INTEGER)");
+        "CREATE TABLE cash (id INTEGER PRIMARY KEY AUTOINCREMENT, hundredRupeeNoteCount INTEGER, twoHundredRupeeNoteCount INTEGER, fiveHundredRupeeNoteCount INTEGER, thousandRupeeNoteCount INTEGER, twoThousandRupeeNoteCount INTEGER, dateTime TEXT)");
   }
 
   Future<CashModel> insert(CashModel cashModel) async {

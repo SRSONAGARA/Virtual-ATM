@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../cash_table/cashTable.dart';
 class CashWithdrawScreen extends StatefulWidget {
   static const String routeName = "/Cash-Withdraw-Screen";
   const CashWithdrawScreen({super.key});
@@ -16,9 +17,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         appBar: AppBar(
           title: const Text(
             'Withdraw Money',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            // style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.blueGrey,
+          // backgroundColor: Colors.blueGrey,
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -77,8 +78,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                   itemBuilder: (context, index) {
                     return Card(
                       child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        title: Text('₹ 100'),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                        title: const Text('₹ 100'),
                         subtitle: Text(DateTime.now().toString()),
                       ),
                     );
@@ -86,16 +87,16 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                 ),
               ),
               const Divider(),
-              const Expanded(
-                flex: 4,
-                child: Text(
-                  'Available Stocks',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey),
+              const Text(
+                'Total Available Stocks:',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
                 ),
-              )
+              ),
+              const SizedBox(height: 10),
+              const Expanded(flex:4,child: CashTable()),
             ],
           ),
         ),

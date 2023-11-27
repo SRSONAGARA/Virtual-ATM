@@ -1,8 +1,10 @@
-import 'package:cash_withdrawer/features/cashTable/cashTable.dart';
+import 'package:cash_withdrawer/features/cash_insertion/bloc/cash_insertion_cubit.dart';
+import 'package:cash_withdrawer/features/cash_insertion/bloc/cash_insertion_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../data/db/database_helper.dart';
-import '../../data/models/cash_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../cash_table/cashTable.dart';
 
 class CashInsertionScreen extends StatefulWidget {
   static const String routeName = "/Cash-Insert-Screen";
@@ -14,78 +16,81 @@ class CashInsertionScreen extends StatefulWidget {
 }
 
 class _CashInsertionScreenState extends State<CashInsertionScreen> {
-  final TextEditingController _hundredController = TextEditingController();
-  final TextEditingController _twoHundredController = TextEditingController();
-  final TextEditingController _fiveHundredController = TextEditingController();
-  final TextEditingController _thousandController = TextEditingController();
-  final TextEditingController _twoThousandController = TextEditingController();
-  late DatabaseHelper _databaseHelper;
-
+  CashInsertionCubit? cashInsertionCubit;
   @override
   void initState() {
     super.initState();
-    _databaseHelper = DatabaseHelper();
+    cashInsertionCubit = CashInsertionCubit();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Add Money',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    return BlocConsumer<CashInsertionCubit, CashInsertionState>(
+        builder: (context, state) {
+      CashInsertionCubit cashInsertionCubit =
+          BlocProvider.of<CashInsertionCubit>(context);
+      return SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Add Money',
+            ),
           ),
-          backgroundColor: Colors.blueGrey,
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 15),
-              const Text(
-                'Enter the number of Notes you want to add',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    children: [
-                      _buildTextField('₹100  ', _hundredController),
-                      _buildTextField('₹200  ', _twoHundredController),
-                      _buildTextField('₹500  ', _fiveHundredController),
-                      _buildTextField('₹1000', _thousandController),
-                      _buildTextField('₹2000', _twoThousandController),
-                      ElevatedButton(
-                        onPressed: _addCash,
-                        child: const Text('Add'),
-                      ),
-                    ],
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 15),
+                const Text(
+                  'Enter the number of Notes you want to add',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey,
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Total Available Stocks:',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                            '₹100  ', cashInsertionCubit.hundredController),
+                        _buildTextField(
+                            '₹200  ', cashInsertionCubit.twoHundredController),
+                        _buildTextField(
+                            '₹500  ', cashInsertionCubit.fiveHundredController),
+                        _buildTextField(
+                            '₹1000', cashInsertionCubit.thousandController),
+                        _buildTextField(
+                            '₹2000', cashInsertionCubit.twoThousandController),
+                        ElevatedButton(
+                          onPressed: () {
+                            cashInsertionCubit.addCash();
+                          },
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const CashTable()
-            ],
+                const SizedBox(height: 10),
+                const CashTable()
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }, listener: (context, state) {
+      if (state is ControllerValueEmptyState) {
+        _showAlertDialog('Empty', 'Please enter values.');
+      } else if (state is DataInsertedSuccessState) {
+        _showAlertDialog('Successful', 'Data Inserted Successfully!.');
+      } else {
+        _showAlertDialog('Error', 'Data note inserted.');
+      }
+    });
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {
@@ -116,55 +121,20 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     );
   }
 
-  void _addCash() async {
-    final controllers = [
-      _hundredController,
-      _twoHundredController,
-      _fiveHundredController,
-      _thousandController,
-      _twoThousandController,
-    ];
-
-    if (controllers.every((controller) => controller.text.isEmpty)) {
-      _showAlertDialog('Error', 'Please enter values.');
-      return;
-    }
-
-    final cashModel = CashModel(
-      hundredRupeeNoteCount: _getValue(_hundredController),
-      twoHundredRupeeNoteCount: _getValue(_twoHundredController),
-      fiveHundredRupeeNoteCount: _getValue(_fiveHundredController),
-      thousandRupeeNoteCount: _getValue(_thousandController),
-      twoThousandRupeeNoteCount: _getValue(_twoThousandController),
-    );
-
-    try {
-      await _databaseHelper.insert(cashModel);
-      print('Data added');
-
-      final cashList = await _databaseHelper.getCashList();
-      if (cashList.isNotEmpty) {
-        for (var cash in cashList) {
-          print('Inserted data: $cash');
-        }
-      } else {
-        print('No data found');
-      }
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
-
-  int _getValue(TextEditingController controller) {
-    return int.tryParse(controller.text) ?? 0;
-  }
-
   void _showAlertDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(title),
         content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }

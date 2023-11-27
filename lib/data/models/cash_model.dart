@@ -5,6 +5,7 @@ class CashModel {
   final int? fiveHundredRupeeNoteCount;
   final int? thousandRupeeNoteCount;
   final int? twoThousandRupeeNoteCount;
+  final DateTime? dateTime;
 
   CashModel(
       {this.id,
@@ -12,7 +13,8 @@ class CashModel {
       this.twoHundredRupeeNoteCount,
       this.fiveHundredRupeeNoteCount,
       this.thousandRupeeNoteCount,
-      this.twoThousandRupeeNoteCount});
+      this.twoThousandRupeeNoteCount,
+      this.dateTime});
 
   @override
   String toString() {
@@ -22,7 +24,8 @@ class CashModel {
         'twoHundredRupeeNoteCount: $twoHundredRupeeNoteCount, '
         'fiveHundredRupeeNoteCount: $fiveHundredRupeeNoteCount, '
         'thousandRupeeNoteCount: $thousandRupeeNoteCount, '
-        'twoThousandRupeeNoteCount: $twoThousandRupeeNoteCount '
+        'twoThousandRupeeNoteCount: $twoThousandRupeeNoteCount, '
+        'dateTime: $dateTime '
         '}';
   }
 
@@ -32,7 +35,8 @@ class CashModel {
         twoHundredRupeeNoteCount = res['twoHundredRupeeNoteCount'],
         fiveHundredRupeeNoteCount = res['fiveHundredRupeeNoteCount'],
         thousandRupeeNoteCount = res['thousandRupeeNoteCount'],
-        twoThousandRupeeNoteCount = res['twoThousandRupeeNoteCount'];
+        twoThousandRupeeNoteCount = res['twoThousandRupeeNoteCount'],
+        dateTime = res['dateTime'] != null ? DateTime.parse(res['dateTime']):null;
 
   Map<String, Object?> toMap() {
     return {
@@ -41,7 +45,8 @@ class CashModel {
       'twoHundredRupeeNoteCount': twoHundredRupeeNoteCount,
       'fiveHundredRupeeNoteCount': fiveHundredRupeeNoteCount,
       'thousandRupeeNoteCount': thousandRupeeNoteCount,
-      'twoThousandRupeeNoteCount': twoThousandRupeeNoteCount
+      'twoThousandRupeeNoteCount': twoThousandRupeeNoteCount,
+      'dateTime': dateTime?.toIso8601String(),
     };
   }
 }

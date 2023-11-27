@@ -1,4 +1,3 @@
-import 'package:cash_withdrawer/features/cashTable/cashTable.dart';
 import 'package:flutter/material.dart';
 import '../cash_insertion/cash_insertion_screen.dart';
 import '../cash_withdraw/cash_withdraw_screen.dart';
@@ -12,8 +11,9 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cash Add-WithDrawer',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: Colors.blueGrey,
+          // style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        // backgroundColor: Colors.blueGrey,
       ),
       body: Center(
         child: Column(
