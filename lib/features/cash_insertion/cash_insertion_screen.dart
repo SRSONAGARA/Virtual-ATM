@@ -23,6 +23,12 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     cashInsertionCubit = CashInsertionCubit();
   }
 
+  void rebuildCashTablePart() {
+    setState(() {
+      // Implement any logic needed to update/rebuild part of CashTable
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CashInsertionCubit, CashInsertionState>(
@@ -76,7 +82,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const CashTable()
+                CashTable(refreshCallback: rebuildCashTablePart)
               ],
             ),
           ),
@@ -85,7 +91,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     }, listener: (context, state) {
       if (state is ControllerValueEmptyState) {
         _showAlertDialog('Empty', 'Please enter values.');
-      } else if (state is DataInsertedSuccessState) {
+      } else if (state is DataInsertionSuccessState) {
         _showAlertDialog('Successful', 'Data Inserted Successfully!.');
       } else {
         _showAlertDialog('Error', 'Data note inserted.');

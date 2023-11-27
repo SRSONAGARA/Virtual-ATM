@@ -13,10 +13,16 @@ class AppRoutes {
         CashInsertionScreen.routeName: (_) => MultiBlocProvider(providers: [
               BlocProvider<CashInsertionCubit>(
                   create: (_) => CashInsertionCubit()),
-          BlocProvider<CashTableCubit>(create: (_)=>CashTableCubit(),)
+              BlocProvider<CashTableCubit>(
+                create: (_) => CashTableCubit(),
+              )
             ], child: const CashInsertionScreen()),
         CashWithdrawScreen.routeName: (_) => const CashWithdrawScreen(),
-        CashTable.routeName: (_) => BlocProvider(
-            create: (_) => CashTableCubit(), child: const CashTable()),
+        CashTable.routeName: (_) => MultiBlocProvider(providers: [
+              BlocProvider(create: (_) => CashTableCubit()),
+              BlocProvider(create: (_) => CashInsertionCubit())
+            ], child: CashTable(refreshCallback: () {  },))
+        // CashTable.routeName: (_) => BlocProvider(
+        //     create: (_) => CashTableCubit(), child: const CashTable()),
       };
 }

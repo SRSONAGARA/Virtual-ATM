@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../data/models/cash_model.dart';
 import 'bloc/cash_table_cubit.dart';
 import 'bloc/cash_table_state.dart';
 
 class CashTable extends StatefulWidget {
   static const String routeName = "/Cash-Table";
-  const CashTable({super.key});
+  final VoidCallback refreshCallback;
+
+  const CashTable({super.key, required this.refreshCallback});
 
   @override
   State<CashTable> createState() => _CashTableState();
@@ -56,7 +59,7 @@ class _CashTableState extends State<CashTable> {
     return noteCounts;
   }
 
-  List<DataRow> _buildTotalNoteCountsRows(Map<int, int> totalNoteCounts) {
+  List<DataRow> buildTotalNoteCountsRows(Map<int, int> totalNoteCounts) {
     List<DataRow> rows = [];
     totalNoteCounts.forEach((denomination, count) {
       rows.add(DataRow(cells: [
@@ -75,7 +78,7 @@ class _CashTableState extends State<CashTable> {
           BlocProvider.of<CashTableCubit>(context);
       final cashList = cashTableCubit.cashList;
       final totalNoteCounts = calculateTotalNoteCount(cashList);
-      final totalNoteCountsRows = _buildTotalNoteCountsRows(totalNoteCounts);
+      final totalNoteCountsRows = buildTotalNoteCountsRows(totalNoteCounts);
       final totalValue = calculateTotalValue(cashList);
       return SingleChildScrollView(
         child: Column(
@@ -102,13 +105,15 @@ class _CashTableState extends State<CashTable> {
                     DataColumn(label: Text('DateTime')),
                   ],
                   rows: cashList.map((cash) {
+                    final formattedTime = DateFormat('HH:mm:ss').format(cash.dateTime!);
+                    final formattedDateTime = '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
                     return DataRow(cells: [
                       DataCell(Text('${cash.hundredRupeeNoteCount}',)),
                       DataCell(Text('${cash.twoHundredRupeeNoteCount}',)),
                       DataCell(Text('${cash.fiveHundredRupeeNoteCount}',)),
                       DataCell(Text('${cash.thousandRupeeNoteCount}',)),
                       DataCell(Text('${cash.twoThousandRupeeNoteCount}',)),
-                      DataCell(Text('${cash.dateTime}',)),
+                      DataCell(Text(formattedDateTime)),
                     ]);
                   }).toList(),
                 ),
@@ -130,7 +135,8 @@ class _CashTableState extends State<CashTable> {
               child: DataTable(columns: const [
                 DataColumn(label: Text('Denomination')),
                 DataColumn(label: Text('Count')),
-              ], rows: totalNoteCountsRows),
+              ], rows: totalNoteCountsRows
+              ),
             ),
             const SizedBox(height: 10),
             Text(

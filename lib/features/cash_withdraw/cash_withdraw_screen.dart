@@ -96,7 +96,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Expanded(flex:4,child: CashTable()),
+              // const Expanded(flex:4,child: CashTable()),
             ],
           ),
         ),

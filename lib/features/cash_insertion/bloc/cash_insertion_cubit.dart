@@ -47,10 +47,10 @@ class CashInsertionCubit extends Cubit<CashInsertionState>{
       fiveHundredController.clear();
       thousandController.clear();
       twoThousandController.clear();
-      emit(DataInsertedSuccessState());
+      emit(DataInsertionSuccessState());
 
     } catch (error) {
-      emit(DataInsertedErrorState());
+      emit(DataInsertionErrorState());
     }
   }
 
