@@ -79,7 +79,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         builder: (context, state) {
       final CashTableCubit cashTableCubit =
           BlocProvider.of<CashTableCubit>(context);
-      final cashList = cashTableCubit.cashList;
+      var cashList = cashTableCubit.cashList;
       totalValue = availableBalance(cashList);
       final totalNoteCounts = calculateTotalNoteCount(cashList);
       final totalNoteCountsRows = buildTotalNoteCountsRows(totalNoteCounts);
@@ -147,13 +147,14 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                     List<CashModel> updatedCashStock =
                                         performWithdrawal(
                                             cashList, enteredAmount);
-                                    cashTableCubit.fetchData();
+                                    // cashTableCubit.fetchData();
 
-                                    await databaseHelper!.updateCashStock(updatedCashStock);
+                                    // await databaseHelper!.updateCashStock(updatedCashStock);
 
                                     setState(() {
-                                    totalValue -= enteredAmount;
-                                    print('totalValue: $totalValue');
+                                      cashList = updatedCashStock;
+                                    // totalValue -= enteredAmount;
+                                    // print('totalValue: $totalValue');
                                   });
                                     _showAlertDialog('Success',
                                         'Amount successfully Withdrawn!');
