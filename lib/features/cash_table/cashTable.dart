@@ -7,33 +7,21 @@ import 'bloc/cash_table_state.dart';
 
 class CashTable extends StatefulWidget {
   static const String routeName = "/Cash-Table";
-  final VoidCallback refreshCallback;
 
-  const CashTable({super.key, required this.refreshCallback});
+  const CashTable({super.key});
 
   @override
   State<CashTable> createState() => _CashTableState();
 }
 
 class _CashTableState extends State<CashTable> {
-  late int totalValue = 0;
+  int totalValue = 0;
 
   @override
   void initState() {
     super.initState();
     CashTableCubit cashTableCubit = BlocProvider.of<CashTableCubit>(context);
     cashTableCubit.fetchData();
-  }
-
-  int calculateTotalValue(List<CashModel> list) {
-    for (var cash in list) {
-      totalValue += (cash.hundredRupeeNoteCount ?? 0) * 100 +
-          (cash.twoHundredRupeeNoteCount ?? 0) * 200 +
-          (cash.fiveHundredRupeeNoteCount ?? 0) * 500 +
-          (cash.thousandRupeeNoteCount ?? 0) * 1000 +
-          (cash.twoThousandRupeeNoteCount ?? 0) * 2000;
-    }
-    return totalValue;
   }
 
   Map<int, int> calculateTotalNoteCount(List<CashModel> cashList) {
@@ -79,11 +67,26 @@ class _CashTableState extends State<CashTable> {
       final cashList = cashTableCubit.cashList;
       final totalNoteCounts = calculateTotalNoteCount(cashList);
       final totalNoteCountsRows = buildTotalNoteCountsRows(totalNoteCounts);
-      final totalValue = calculateTotalValue(cashList);
       return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Total Available Stocks:',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: DataTable(columns: const [
+                DataColumn(label: Text('Denomination')),
+                DataColumn(label: Text('Count')),
+              ], rows: totalNoteCountsRows),
+            ),
+            const SizedBox(height: 10),
             const Text(
               'Insertion History:',
               style: TextStyle(
@@ -105,14 +108,26 @@ class _CashTableState extends State<CashTable> {
                     DataColumn(label: Text('DateTime')),
                   ],
                   rows: cashList.map((cash) {
-                    final formattedTime = DateFormat('HH:mm:ss').format(cash.dateTime!);
-                    final formattedDateTime = '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
+                    final formattedTime =
+                        DateFormat('HH:mm:ss').format(cash.dateTime!);
+                    final formattedDateTime =
+                        '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
                     return DataRow(cells: [
-                      DataCell(Text('${cash.hundredRupeeNoteCount}',)),
-                      DataCell(Text('${cash.twoHundredRupeeNoteCount}',)),
-                      DataCell(Text('${cash.fiveHundredRupeeNoteCount}',)),
-                      DataCell(Text('${cash.thousandRupeeNoteCount}',)),
-                      DataCell(Text('${cash.twoThousandRupeeNoteCount}',)),
+                      DataCell(Text(
+                        '${cash.hundredRupeeNoteCount}',
+                      )),
+                      DataCell(Text(
+                        '${cash.twoHundredRupeeNoteCount}',
+                      )),
+                      DataCell(Text(
+                        '${cash.fiveHundredRupeeNoteCount}',
+                      )),
+                      DataCell(Text(
+                        '${cash.thousandRupeeNoteCount}',
+                      )),
+                      DataCell(Text(
+                        '${cash.twoThousandRupeeNoteCount}',
+                      )),
                       DataCell(Text(formattedDateTime)),
                     ]);
                   }).toList(),
@@ -122,32 +137,6 @@ class _CashTableState extends State<CashTable> {
             const SizedBox(
               height: 10,
             ),
-            const Text(
-              'Total Available Stocks:',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Card(
-              child: DataTable(columns: const [
-                DataColumn(label: Text('Denomination')),
-                DataColumn(label: Text('Count')),
-              ], rows: totalNoteCountsRows
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Total available Balance: ₹$totalValue',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey,
-              ),
-            ),
-            const SizedBox(height: 10),
           ],
         ),
       );

@@ -42,4 +42,24 @@ class DatabaseHelper {
 
     return queryResult.map((e) => CashModel.fromMap(e)).toList();
   }
+
+  Future<void> updateCashStock(List<CashModel> updatedCashStock) async {
+    try {
+      var databaseClient = await database;
+
+      for (var cashModel in updatedCashStock) {
+        await databaseClient!.update(
+          'cash',
+          cashModel.toMap(),
+          where: 'id = ?',
+          whereArgs: [cashModel.id], // Assuming 'id' is the primary key
+        );
+      }
+
+      print('Cash stock updated successfully!');
+    } catch (error) {
+      print('Error updating cash stock: $error');
+      throw error;
+    }
+  }
 }

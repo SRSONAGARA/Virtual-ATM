@@ -1,10 +1,10 @@
 class CashModel {
   final int? id;
-  final int? hundredRupeeNoteCount;
-  final int? twoHundredRupeeNoteCount;
-  final int? fiveHundredRupeeNoteCount;
-  final int? thousandRupeeNoteCount;
-  final int? twoThousandRupeeNoteCount;
+  int? hundredRupeeNoteCount;
+  int? twoHundredRupeeNoteCount;
+  int? fiveHundredRupeeNoteCount;
+  int? thousandRupeeNoteCount;
+  int? twoThousandRupeeNoteCount;
   final DateTime? dateTime;
 
   CashModel(

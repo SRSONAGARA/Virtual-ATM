@@ -1,5 +1,6 @@
 import 'package:cash_withdrawer/features/cash_insertion/bloc/cash_insertion_cubit.dart';
 import 'package:cash_withdrawer/features/cash_insertion/bloc/cash_insertion_state.dart';
+import 'package:cash_withdrawer/features/cash_table/bloc/cash_table_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,14 +24,9 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     cashInsertionCubit = CashInsertionCubit();
   }
 
-  void rebuildCashTablePart() {
-    setState(() {
-      // Implement any logic needed to update/rebuild part of CashTable
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    CashTableCubit cashTable = BlocProvider.of<CashTableCubit>(context);
     return BlocConsumer<CashInsertionCubit, CashInsertionState>(
         builder: (context, state) {
       CashInsertionCubit cashInsertionCubit =
@@ -74,6 +70,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                         ElevatedButton(
                           onPressed: () {
                             cashInsertionCubit.addCash();
+                            cashTable.fetchData();
                           },
                           child: const Text('Add'),
                         ),
@@ -82,7 +79,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                CashTable(refreshCallback: rebuildCashTablePart)
+                const CashTable()
               ],
             ),
           ),
