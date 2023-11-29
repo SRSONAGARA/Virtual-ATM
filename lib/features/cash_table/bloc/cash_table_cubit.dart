@@ -14,7 +14,6 @@ class CashTableCubit extends Cubit<CashTableState>{
   Future<void> fetchData() async {
     try {
       cashList = await _databaseHelper.getCashList();
-      // print(cashList);
       emit(DataFetchedSuccessState());
     } catch (error) {
       print('Error fetching data: $error');
@@ -25,7 +24,6 @@ class CashTableCubit extends Cubit<CashTableState>{
   Future<void> fetchDenominationCount() async {
     try {
       denominationCountList = await _databaseHelper.getDenominationCountList();
-      // print('denominationCountList: $denominationCountList');
       emit(DataFetchedSuccessState());
     } catch (error) {
       print('Error fetching data: $error');

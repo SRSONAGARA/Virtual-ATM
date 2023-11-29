@@ -38,7 +38,7 @@ class _CashTableState extends State<CashTable> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Total Available Stocks:',
+              'Available Stocks of each denominations:',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,

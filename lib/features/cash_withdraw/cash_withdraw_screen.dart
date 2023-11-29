@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/models/cash_model.dart';
+import '../../data/models/denomination_count_model.dart';
 import '../cash_table/bloc/cash_table_cubit.dart';
 
 class CashWithdrawScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class CashWithdrawScreen extends StatefulWidget {
 class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
   int totalValue = 0;
   TextEditingController amountToWithdraw = TextEditingController();
+  List noteCountList = [];
   DatabaseHelper? databaseHelper;
   int availableBalance(List<CashModel> list) {
     for (var cash in list) {
@@ -32,7 +34,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     CashTableCubit cashTableCubit = BlocProvider.of<CashTableCubit>(context);
     cashTableCubit.fetchData();
@@ -47,7 +48,19 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
           BlocProvider.of<CashTableCubit>(context);
       final cashList = cashTableCubit.cashList;
       final denominationCountList = cashTableCubit.denominationCountList;
+      print('denominationCountList:$denominationCountList');
+      var notes = [2000, 500, 200, 100];
+      noteCountList = denominationCountList.expand<int>((denominationCount) {
+        return [
+          denominationCount.hundredRupeeTotalNoteCount ?? 0,
+          denominationCount.twoHundredRupeeTotalNoteCount ?? 0,
+          denominationCount.fiveHundredRupeeTotalNoteCount ?? 0,
+          denominationCount.thousandRupeeTotalNoteCount ?? 0,
+          denominationCount.twoThousandRupeeTotalNoteCount ?? 0,
+        ];
+      }).toList();
 
+      print('noteCountList: $noteCountList');
       totalValue = availableBalance(cashList);
 
       return SafeArea(
@@ -110,18 +123,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                               if (enteredAmount != 0) {
                                 if (enteredAmount <= totalValue) {
                                   if (enteredAmount % 100 == 0) {
-                                    // List<CashModel> updatedCashStock =
-                                    //     performWithdrawal(
-                                    //         cashList, enteredAmount);
-                                    // cashTableCubit.fetchData();
+                                    totalValue -= enteredAmount;
+                                    // performWithdrawal(enteredAmount, denominationCountList);
 
-                                    // await databaseHelper!.updateCashStock(updatedCashStock);
-
-                                    /*setState(() {
-                                      // cashList = updatedCashStock;
-                                      // totalValue -= enteredAmount;
-                                      // print('totalValue: $totalValue');
-                                    });*/
                                     _showAlertDialog('Success',
                                         'Amount successfully Withdrawn!');
                                   } else {
@@ -149,7 +153,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                         fontWeight: FontWeight.bold,
                         color: Colors.blueGrey)),
                 Expanded(
-                  flex: 3,
+                  flex: 7,
                   child: ListView.builder(
                     itemCount: 3,
                     itemBuilder: (context, index) {
@@ -161,7 +165,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                               'You withdraw an amount of ₹ ${amountToWithdraw.text}'),
                           subtitle: Text(
                               '${DateFormat('dd-MM-yyyy').format(DateTime.now())}  ${DateFormat('HH:mm:ss').format(DateTime.now())}'),
-                          // subtitle: Text(DateTime.now().toString()),
                         ),
                       );
                     },
@@ -178,9 +181,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  flex: 5,
+                  flex: 6,
                   child: SingleChildScrollView(
-                    child:  FittedBox(
+                    child: FittedBox(
                       child: Card(
                         child: DataTable(
                           columns: const [
@@ -222,47 +225,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     });
   }
 
-  List<CashModel> performWithdrawal(
-      List<CashModel> cashList, int enteredAmount) {
-    int remainingAmount = enteredAmount;
-    List<CashModel> updatedCashList = List.from(cashList);
-    for (var cash in updatedCashList) {
-      int hundredValue = (cash.hundredRupeeNoteCount ?? 0) * 100;
-      int twoHundredValue = (cash.twoHundredRupeeNoteCount ?? 0) * 200;
-      int fiveHundredValue = (cash.fiveHundredRupeeNoteCount ?? 0) * 500;
-      int thousandValue = (cash.thousandRupeeNoteCount ?? 0) * 1000;
-      int twoThousandValue = (cash.twoThousandRupeeNoteCount ?? 0) * 2000;
+  void performWithdrawal() {
 
-      int totalValue = hundredValue +
-          twoHundredValue +
-          fiveHundredValue +
-          thousandValue +
-          twoThousandValue;
-      if (totalValue >= remainingAmount) {
-        int remainingValue = totalValue - remainingAmount;
-
-        cash.hundredRupeeNoteCount = remainingValue ~/ 100;
-        remainingValue %= 100;
-        cash.twoHundredRupeeNoteCount = remainingValue ~/ 200;
-        remainingValue %= 200;
-        cash.fiveHundredRupeeNoteCount = remainingValue ~/ 500;
-        remainingValue %= 500;
-        cash.thousandRupeeNoteCount = remainingValue ~/ 1000;
-        remainingValue %= 1000;
-        cash.twoThousandRupeeNoteCount = remainingValue ~/ 2000;
-        break;
-      } else {
-        int denominationWithdrawn = totalValue;
-        cash.hundredRupeeNoteCount = 0;
-        cash.twoHundredRupeeNoteCount = 0;
-        cash.fiveHundredRupeeNoteCount = 0;
-        cash.thousandRupeeNoteCount = 0;
-        cash.twoThousandRupeeNoteCount = 0;
-
-        remainingAmount -= denominationWithdrawn;
-      }
-    }
-    return cashList;
   }
 
   void _showAlertDialog(String title, String message) {
