@@ -19,7 +19,7 @@ class CashWithdrawScreen extends StatefulWidget {
 class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
   int totalValue = 0;
   TextEditingController amountToWithdraw = TextEditingController();
-  List noteCountList = [];
+  List<int> noteCountList = [];
   DatabaseHelper? databaseHelper;
   int availableBalance(List<CashModel> list) {
     for (var cash in list) {
@@ -49,7 +49,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
       final cashList = cashTableCubit.cashList;
       final denominationCountList = cashTableCubit.denominationCountList;
       print('denominationCountList:$denominationCountList');
-      var notes = [2000, 500, 200, 100];
+      var notes = [2000, 1000, 500, 200, 100];
+
       noteCountList = denominationCountList.expand<int>((denominationCount) {
         return [
           denominationCount.hundredRupeeTotalNoteCount ?? 0,
@@ -124,7 +125,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                 if (enteredAmount <= totalValue) {
                                   if (enteredAmount % 100 == 0) {
                                     totalValue -= enteredAmount;
-                                    // performWithdrawal(enteredAmount, denominationCountList);
+                                    performWithdrawal(enteredAmount, noteCountList);
 
                                     _showAlertDialog('Success',
                                         'Amount successfully Withdrawn!');
@@ -225,8 +226,36 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     });
   }
 
-  void performWithdrawal() {
+  Map<int, int> performWithdrawal(int enteredAmount, List<int> noteCountList) {
+    final denominations = [2000, 1000, 500, 200, 100];
 
+    /*int totalAvailableAmount = 0;
+    for (int i = 0; i < denominations.length; i++) {
+      totalAvailableAmount += denominations[i] * noteCountList[i];
+    }*/
+
+    Map<int, int> result = {};
+    int remainingAmount = enteredAmount;
+
+    for (int i = 0; i < denominations.length; i++) {
+      int denomination = denominations[i];
+      int notesAvailable = noteCountList[i];
+
+      while (remainingAmount >= denomination && notesAvailable > 0) {
+        result[denomination] = (result[denomination] ?? 0) + 1;
+        notesAvailable--;
+        remainingAmount -= denomination;
+      }
+      noteCountList[i] = notesAvailable;
+    }
+    if (remainingAmount > 0) {
+      return {
+        0: 0
+      }; // Handle unable to dispense requested amount with available notes
+    }
+
+    print('result: $result');
+    return result;
   }
 
   void _showAlertDialog(String title, String message) {
