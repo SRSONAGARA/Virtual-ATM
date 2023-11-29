@@ -36,41 +36,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     super.initState();
     CashTableCubit cashTableCubit = BlocProvider.of<CashTableCubit>(context);
     cashTableCubit.fetchData();
-  }
-
-  Map<int, int> calculateTotalNoteCount(List<CashModel> cashList) {
-    Map<int, int> noteCounts = {
-      100: 0,
-      200: 0,
-      500: 0,
-      1000: 0,
-      2000: 0,
-    };
-    for (var cash in cashList) {
-      noteCounts[100] =
-          (noteCounts[100] ?? 0) + (cash.hundredRupeeNoteCount ?? 0);
-      noteCounts[200] =
-          (noteCounts[200] ?? 0) + (cash.twoHundredRupeeNoteCount ?? 0);
-      noteCounts[500] =
-          (noteCounts[500] ?? 0) + (cash.fiveHundredRupeeNoteCount ?? 0);
-      noteCounts[1000] =
-          (noteCounts[1000] ?? 0) + (cash.thousandRupeeNoteCount ?? 0);
-      noteCounts[2000] =
-          (noteCounts[2000] ?? 0) + (cash.twoThousandRupeeNoteCount ?? 0);
-    }
-    print('noteCounts: $noteCounts');
-    return noteCounts;
-  }
-
-  List<DataRow> buildTotalNoteCountsRows(Map<int, int> totalNoteCounts) {
-    List<DataRow> rows = [];
-    totalNoteCounts.forEach((denomination, count) {
-      rows.add(DataRow(cells: [
-        DataCell(Text('₹$denomination')),
-        DataCell(Text('$count')),
-      ]));
-    });
-    return rows;
+    cashTableCubit.fetchDenominationCount();
   }
 
   @override
@@ -79,10 +45,10 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         builder: (context, state) {
       final CashTableCubit cashTableCubit =
           BlocProvider.of<CashTableCubit>(context);
-      var cashList = cashTableCubit.cashList;
+      final cashList = cashTableCubit.cashList;
+      final denominationCountList = cashTableCubit.denominationCountList;
+
       totalValue = availableBalance(cashList);
-      final totalNoteCounts = calculateTotalNoteCount(cashList);
-      final totalNoteCountsRows = buildTotalNoteCountsRows(totalNoteCounts);
 
       return SafeArea(
         child: Scaffold(
@@ -144,18 +110,18 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                               if (enteredAmount != 0) {
                                 if (enteredAmount <= totalValue) {
                                   if (enteredAmount % 100 == 0) {
-                                    List<CashModel> updatedCashStock =
-                                        performWithdrawal(
-                                            cashList, enteredAmount);
+                                    // List<CashModel> updatedCashStock =
+                                    //     performWithdrawal(
+                                    //         cashList, enteredAmount);
                                     // cashTableCubit.fetchData();
 
                                     // await databaseHelper!.updateCashStock(updatedCashStock);
 
-                                    setState(() {
-                                      cashList = updatedCashStock;
-                                    // totalValue -= enteredAmount;
-                                    // print('totalValue: $totalValue');
-                                  });
+                                    /*setState(() {
+                                      // cashList = updatedCashStock;
+                                      // totalValue -= enteredAmount;
+                                      // print('totalValue: $totalValue');
+                                    });*/
                                     _showAlertDialog('Success',
                                         'Amount successfully Withdrawn!');
                                   } else {
@@ -214,11 +180,37 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                 Expanded(
                   flex: 5,
                   child: SingleChildScrollView(
-                    child: Card(
-                      child: DataTable(columns: const [
-                        DataColumn(label: Text('Denomination')),
-                        DataColumn(label: Text('Count')),
-                      ], rows: totalNoteCountsRows),
+                    child:  FittedBox(
+                      child: Card(
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Text('₹100')),
+                            DataColumn(label: Text('₹200')),
+                            DataColumn(label: Text('₹500')),
+                            DataColumn(label: Text('₹1000')),
+                            DataColumn(label: Text('₹2000')),
+                          ],
+                          rows: denominationCountList.map((denominationCount) {
+                            return DataRow(cells: [
+                              DataCell(Text(
+                                '${denominationCount.hundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.twoHundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.fiveHundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.thousandRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.twoThousandRupeeTotalNoteCount}',
+                              )),
+                            ]);
+                          }).toList(),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -260,7 +252,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         cash.twoThousandRupeeNoteCount = remainingValue ~/ 2000;
         break;
       } else {
-        print('else');
         int denominationWithdrawn = totalValue;
         cash.hundredRupeeNoteCount = 0;
         cash.twoHundredRupeeNoteCount = 0;
@@ -271,7 +262,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         remainingAmount -= denominationWithdrawn;
       }
     }
-    print('success');
     return cashList;
   }
 

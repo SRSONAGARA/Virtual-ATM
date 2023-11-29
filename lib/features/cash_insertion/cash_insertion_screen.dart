@@ -68,9 +68,10 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                         _buildTextField(
                             '₹2000', cashInsertionCubit.twoThousandController),
                         ElevatedButton(
-                          onPressed: () {
-                            cashInsertionCubit.addCash();
-                            cashTable.fetchData();
+                          onPressed: () async {
+                            await cashInsertionCubit.addCash();
+                            await cashTable.fetchData();
+                            await cashTable.fetchDenominationCount();
                           },
                           child: const Text('Add'),
                         ),
