@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/db/database_helper.dart';
 import '../../../data/models/cash_model.dart';
 
-class CashInsertionCubit extends Cubit<CashInsertionState>{
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
-  CashInsertionCubit():super(CashInsertionInitialState());
+class CashInsertionCubit extends Cubit<CashInsertionState> {
+  final DatabaseHelper databaseHelper = DatabaseHelper();
+  CashInsertionCubit() : super(CashInsertionInitialState());
 
   final hundredController = TextEditingController();
   final twoHundredController = TextEditingController();
@@ -30,7 +30,8 @@ class CashInsertionCubit extends Cubit<CashInsertionState>{
       return;
     }
 
-    final cashModel = CashModel(
+    final
+    cashModel = CashModel(
       hundredRupeeNoteCount: _getValue(hundredController),
       twoHundredRupeeNoteCount: _getValue(twoHundredController),
       fiveHundredRupeeNoteCount: _getValue(fiveHundredController),
@@ -62,7 +63,9 @@ class CashInsertionCubit extends Cubit<CashInsertionState>{
       return noteCounts;
     }
 
-    final cashList = await _databaseHelper.getCashList();
+    final cashList = await databaseHelper.getCashList();
+    print('cashList : $cashList');
+
     final totalNoteCounts = calculateTotalNoteCount(cashList..add(cashModel));
 
     final denominationCountModel = DenominationCountModel(
@@ -74,17 +77,16 @@ class CashInsertionCubit extends Cubit<CashInsertionState>{
     );
 
     try {
-      var data = await _databaseHelper.insert(cashModel);
+      await databaseHelper.insert(cashModel);
       hundredController.clear();
       twoHundredController.clear();
       fiveHundredController.clear();
       thousandController.clear();
       twoThousandController.clear();
 
-      await _databaseHelper.insertIntoDenominationCount(denominationCountModel);
+      await databaseHelper.insertIntoDenominationCount(denominationCountModel);
 
       emit(DataInsertionSuccessState());
-
     } catch (error) {
       emit(DataInsertionErrorState());
     }

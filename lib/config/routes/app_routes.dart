@@ -1,4 +1,5 @@
 import 'package:cash_withdrawer/features/cash_insertion/bloc/cash_insertion_cubit.dart';
+import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/cash_insertion/cash_insertion_screen.dart';
@@ -17,9 +18,10 @@ class AppRoutes {
                 create: (_) => CashTableCubit(),
               )
             ], child: const CashInsertionScreen()),
-        CashWithdrawScreen.routeName: (_) => MultiBlocProvider(
-            providers: [BlocProvider(create: (_) => CashTableCubit())],
-            child: const CashWithdrawScreen()),
+        CashWithdrawScreen.routeName: (_) => MultiBlocProvider(providers: [
+              BlocProvider(create: (_) => CashTableCubit()),
+              BlocProvider(create: (_) => CashWithdrawCubit())
+            ], child: const CashWithdrawScreen()),
         CashTable.routeName: (_) => MultiBlocProvider(providers: [
               BlocProvider(create: (_) => CashTableCubit()),
               BlocProvider(create: (_) => CashInsertionCubit())

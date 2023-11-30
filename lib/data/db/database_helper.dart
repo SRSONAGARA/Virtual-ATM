@@ -79,6 +79,39 @@ class DatabaseHelper {
     return denominationCount;
   }
 
+  Future<void> updateDatabase(Map<int, int> updatedNoteCounts) async {
+    var databaseClient = await database;
+
+    List<DenominationCountModel> existingDenominationCounts =
+        await getDenominationCountList();
+
+    int updatedCountForHundred =
+        existingDenominationCounts.first.hundredRupeeTotalNoteCount! -
+            (updatedNoteCounts[100] ?? 0);
+    int updatedCountForTwoHundred =
+        existingDenominationCounts.first.twoHundredRupeeTotalNoteCount! -
+            (updatedNoteCounts[200] ?? 0);
+    int updatedCountForFiveHundred =
+        existingDenominationCounts.first.fiveHundredRupeeTotalNoteCount! -
+            (updatedNoteCounts[500] ?? 0);
+    int updatedCountForThousand =
+        existingDenominationCounts.first.thousandRupeeTotalNoteCount! -
+            (updatedNoteCounts[1000] ?? 0);
+    int updatedCountForTowThousand =
+        existingDenominationCounts.first.twoThousandRupeeTotalNoteCount! -
+            (updatedNoteCounts[2000] ?? 0);
+
+    DenominationCountModel updatedDenominationCount = DenominationCountModel(
+        hundredRupeeTotalNoteCount: updatedCountForHundred,
+        twoHundredRupeeTotalNoteCount: updatedCountForTwoHundred,
+        fiveHundredRupeeTotalNoteCount: updatedCountForFiveHundred,
+        thousandRupeeTotalNoteCount: updatedCountForThousand,
+        twoThousandRupeeTotalNoteCount: updatedCountForTowThousand);
+
+    print('updatedDenominationCount: $updatedDenominationCount');
+    await insertIntoDenominationCount(updatedDenominationCount);
+  }
+
   Future<List<DenominationCountModel>> getDenominationCountList() async {
     var databaseClient = await database;
     final List<Map<String, Object?>> queryResult =

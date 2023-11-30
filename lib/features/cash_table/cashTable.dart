@@ -32,6 +32,8 @@ class _CashTableState extends State<CashTable> {
       final CashTableCubit cashTableCubit =
           BlocProvider.of<CashTableCubit>(context);
       final cashList = cashTableCubit.cashList;
+
+      cashTableCubit.fetchDenominationCount();
       final denominationCountList = cashTableCubit.denominationCountList;
       return SingleChildScrollView(
         child: Column(
@@ -80,7 +82,7 @@ class _CashTableState extends State<CashTable> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Insertion History:',
+              'Cash History:',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
