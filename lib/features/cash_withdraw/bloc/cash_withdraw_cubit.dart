@@ -8,6 +8,8 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
   final DatabaseHelper databaseHelper = DatabaseHelper();
   CashWithdrawCubit() : super(CashWithdrawInitialState());
 
+  List<int> withdrawalTransactions= [];
+
   Future<Map<int, int>> performWithdrawal(
       int enteredAmount, List<int> noteCountList) async {
     final denominations = [2000, 1000, 500, 200, 100];
@@ -38,6 +40,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
           result.map((key, value) => MapEntry(key, -value));
 
       await databaseHelper.updateDatabase(result);
+
       final cashModel = CashModel(
         hundredRupeeNoteCount:
             negativeResult.containsKey(100) ? negativeResult[100] ?? 0 : 0,
@@ -51,8 +54,9 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
             negativeResult.containsKey(2000) ? negativeResult[2000] ?? 0 : 0,
         dateTime: DateTime.now(),
       );
-
       await databaseHelper.insert(cashModel);
+
+      withdrawalTransactions.add(enteredAmount);
       emit(CashWithdrawSuccessState());
     }
 
