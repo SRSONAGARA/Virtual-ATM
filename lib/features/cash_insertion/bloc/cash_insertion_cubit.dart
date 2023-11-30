@@ -30,8 +30,7 @@ class CashInsertionCubit extends Cubit<CashInsertionState> {
       return;
     }
 
-    final
-    cashModel = CashModel(
+    final cashModel = CashModel(
       hundredRupeeNoteCount: _getValue(hundredController),
       twoHundredRupeeNoteCount: _getValue(twoHundredController),
       fiveHundredRupeeNoteCount: _getValue(fiveHundredController),

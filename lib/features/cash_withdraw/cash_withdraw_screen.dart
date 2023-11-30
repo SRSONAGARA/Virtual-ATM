@@ -24,7 +24,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
   List<int> noteCountList = [];
   DatabaseHelper? databaseHelper;
 
-
   @override
   void initState() {
     super.initState();
@@ -67,6 +66,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         }
         return totalValue;
       }
+
       totalValue = availableBalance(cashList);
       return BlocConsumer<CashWithdrawCubit, CashWithdrawState>(
           builder: (context, state) {
@@ -132,10 +132,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                     if (enteredAmount % 100 == 0) {
                                       await cashWithdrawCubit.performWithdrawal(
                                           enteredAmount, noteCountList);
-                                      /*setState(() {
-                                        totalValue -= enteredAmount;
-                                      });*/
-
                                     } else {
                                       showAlertDialog('Success',
                                           'Amount should be a multiple of 100');
