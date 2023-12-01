@@ -110,6 +110,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
             child: TextField(
               style: const TextStyle(fontWeight: FontWeight.bold),
               inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                 LengthLimitingTextInputFormatter(5),
               ],
               controller: controller,

@@ -1,3 +1,4 @@
+import 'package:cash_withdrawer/data/models/withdraw_history_model.dart';
 import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/db/database_helper.dart';
@@ -7,7 +8,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
   final DatabaseHelper databaseHelper = DatabaseHelper();
   CashWithdrawCubit() : super(CashWithdrawInitialState());
 
-  List<int> withdrawalTransactions = [];
+  List<WithdrawHistoryModel> withdrawalTransactions = [];
 
   Future<Map<int, int>> performWithdrawal(
       int enteredAmount, List<int> noteCountList) async {
@@ -52,9 +53,26 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
       );
       await databaseHelper.insert(cashModel);
 
-      withdrawalTransactions.add(enteredAmount);
+      final withdrawalDateTime = DateTime.now();
+
+      final withdrawHistoryModel= WithdrawHistoryModel(
+        withdrawnAmount: enteredAmount,
+        dateTime: withdrawalDateTime
+      );
+      await databaseHelper.insertIntoWithdrawHistory(withdrawHistoryModel);
+
       emit(CashWithdrawSuccessState());
     }
     return result;
+  }
+
+  Future<void> fetchWithdrawHistory() async {
+    try {
+      withdrawalTransactions = await databaseHelper.getWithdrawList();
+      emit(HistoryFetchedSuccess());
+    } catch (error) {
+      print('Error fetching data: $error');
+      emit(HistoryFetchedError());
+    }
   }
 }

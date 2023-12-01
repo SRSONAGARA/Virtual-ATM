@@ -4,6 +4,7 @@ import 'package:cash_withdrawer/features/cash_table/bloc/cash_table_state.dart';
 import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_cubit.dart';
 import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../cash_table/bloc/cash_table_cubit.dart';
@@ -29,6 +30,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     CashTableCubit cashTableCubit = BlocProvider.of<CashTableCubit>(context);
     cashTableCubit.fetchData();
     cashTableCubit.fetchDenominationCount();
+    CashWithdrawCubit cashWithdrawCubit =
+        BlocProvider.of<CashWithdrawCubit>(context);
+    cashWithdrawCubit.fetchWithdrawHistory();
   }
 
   @override
@@ -49,7 +53,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         ];
       }).toList();
 
-
       for (var denominationCount in denominationCountList) {
         totalValue = (denominationCount.hundredRupeeTotalNoteCount ?? 0) * 100 +
             (denominationCount.twoHundredRupeeTotalNoteCount ?? 0) * 200 +
@@ -62,6 +65,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
           builder: (context, state) {
         CashWithdrawCubit cashWithdrawCubit =
             BlocProvider.of<CashWithdrawCubit>(context);
+        final withdrawalTransactions = cashWithdrawCubit.withdrawalTransactions;
+        print('withdrawalTransactions:$withdrawalTransactions');
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
@@ -99,6 +104,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                           Expanded(
                             child: TextField(
                               controller: amountToWithdraw,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                              ],
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 prefixText: '₹ ',
@@ -126,6 +134,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                           enteredAmount, noteCountList);
                                       await cashTableCubit
                                           .fetchDenominationCount();
+                                      await cashWithdrawCubit.fetchWithdrawHistory();
+                                      amountToWithdraw.clear();
                                     } else {
                                       showAlertDialog('Success',
                                           'Amount should be a multiple of 100');
@@ -152,27 +162,27 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                           color: Colors.blueGrey)),
                   Expanded(
                     flex: 7,
-                    child: cashWithdrawCubit.withdrawalTransactions.isEmpty
+                    child: withdrawalTransactions.isEmpty
                         ? const Text('You have note yet done any withdrawal!')
                         : ListView.builder(
-                            itemCount: min(
-                                3,
-                                cashWithdrawCubit
-                                    .withdrawalTransactions.length),
+                            itemCount: min(3, withdrawalTransactions.length),
                             itemBuilder: (context, index) {
-                              final transaction = cashWithdrawCubit
-                                  .withdrawalTransactions[index];
-
-                              return Card(
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  title: Text(
-                                      'You withdraw an amount of ₹ $transaction'),
-                                  subtitle: Text(
-                                      '${DateFormat('dd-MM-yyyy').format(DateTime.now())}  ${DateFormat('HH:mm:ss').format(DateTime.now())}'),
-                                ),
-                              );
+                              final reversedList =
+                                  withdrawalTransactions.reversed.toList();
+                              if (index < reversedList.length) {
+                                final transaction = reversedList[index];
+                                print('transaction:$transaction');
+                                return Card(
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    title: Text(
+                                        'You withdraw an amount of ₹ ${transaction.withdrawnAmount}'),
+                                    subtitle: Text(
+                                        '${DateFormat('dd-MM-yyyy').format(transaction.dateTime ?? DateTime.now())}  ${DateFormat('HH:mm:ss').format(transaction.dateTime ?? DateTime.now())}'),
+                                  ),
+                                );
+                              }
                             },
                           ),
                   ),

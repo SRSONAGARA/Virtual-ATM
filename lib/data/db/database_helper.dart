@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
 import '../models/cash_model.dart';
+import '../models/withdraw_history_model.dart';
 
 class DatabaseHelper {
   static Database? _database;
@@ -31,6 +32,9 @@ class DatabaseHelper {
 
     await database.execute(
         "CREATE TABLE denominationCount (id INTEGER PRIMARY KEY AUTOINCREMENT, hundredRupeeTotalNoteCount INTEGER, twoHundredRupeeTotalNoteCount INTEGER, fiveHundredRupeeTotalNoteCount INTEGER, thousandRupeeTotalNoteCount INTEGER, twoThousandRupeeTotalNoteCount INTEGER)");
+
+    await database.execute(
+        "CREATE TABLE withdrawalHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, withdrawnAmount INTEGER, dateTime TEXT)");
   }
 
   Future<CashModel> insert(CashModel cashModel) async {
@@ -118,5 +122,20 @@ class DatabaseHelper {
         await databaseClient!.query('denominationCount');
 
     return queryResult.map((e) => DenominationCountModel.fromMap(e)).toList();
+  }
+  
+  Future<WithdrawHistoryModel> insertIntoWithdrawHistory(WithdrawHistoryModel withdrawHistoryModel)async{
+    var databaseClient = await database;
+    await databaseClient!.insert('withdrawalHistory', withdrawHistoryModel.toMap());
+    print('insertIntoWithdrawHistory');
+    return withdrawHistoryModel;
+  }
+
+  Future<List<WithdrawHistoryModel>> getWithdrawList() async {
+    var databaseClient = await database;
+    final List<Map<String, Object?>> queryResult =
+    await databaseClient!.query('withdrawalHistory');
+
+    return queryResult.map((e) => WithdrawHistoryModel.fromMap(e)).toList();
   }
 }
