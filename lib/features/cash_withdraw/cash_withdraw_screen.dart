@@ -6,7 +6,6 @@ import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_state.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/cash_model.dart';
 import '../cash_table/bloc/cash_table_cubit.dart';
 
 class CashWithdrawScreen extends StatefulWidget {
@@ -18,9 +17,9 @@ class CashWithdrawScreen extends StatefulWidget {
 }
 
 class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
-  int totalValue = 0;
   TextEditingController amountToWithdraw = TextEditingController();
   List<int> noteCountList = [];
+  int totalValue = 0;
   DatabaseHelper? databaseHelper;
 
   @override
@@ -36,13 +35,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<CashTableCubit, CashTableState>(
         builder: (context, state) {
-      final CashWithdrawCubit cashWithdrawCubit =
-          BlocProvider.of<CashWithdrawCubit>(context);
       final CashTableCubit cashTableCubit =
           BlocProvider.of<CashTableCubit>(context);
-      final cashList = cashTableCubit.cashList;
       final denominationCountList = cashTableCubit.denominationCountList;
-      print('denominationCountList:$denominationCountList');
 
       noteCountList = denominationCountList.expand<int>((denominationCount) {
         return [
@@ -54,21 +49,19 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         ];
       }).toList();
 
-      print('noteCountList: $noteCountList');
-      int availableBalance(List<CashModel> list) {
-        for (var cash in list) {
-          totalValue += (cash.hundredRupeeNoteCount ?? 0) * 100 +
-              (cash.twoHundredRupeeNoteCount ?? 0) * 200 +
-              (cash.fiveHundredRupeeNoteCount ?? 0) * 500 +
-              (cash.thousandRupeeNoteCount ?? 0) * 1000 +
-              (cash.twoThousandRupeeNoteCount ?? 0) * 2000;
-        }
-        return totalValue;
+
+      for (var denominationCount in denominationCountList) {
+        totalValue = (denominationCount.hundredRupeeTotalNoteCount ?? 0) * 100 +
+            (denominationCount.twoHundredRupeeTotalNoteCount ?? 0) * 200 +
+            (denominationCount.fiveHundredRupeeTotalNoteCount ?? 0) * 500 +
+            (denominationCount.thousandRupeeTotalNoteCount ?? 0) * 1000 +
+            (denominationCount.twoThousandRupeeTotalNoteCount ?? 0) * 2000;
       }
 
-      totalValue = availableBalance(cashList);
       return BlocConsumer<CashWithdrawCubit, CashWithdrawState>(
           builder: (context, state) {
+        CashWithdrawCubit cashWithdrawCubit =
+            BlocProvider.of<CashWithdrawCubit>(context);
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
@@ -131,6 +124,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                     if (enteredAmount % 100 == 0) {
                                       await cashWithdrawCubit.performWithdrawal(
                                           enteredAmount, noteCountList);
+                                      await cashTableCubit
+                                          .fetchDenominationCount();
                                     } else {
                                       showAlertDialog('Success',
                                           'Amount should be a multiple of 100');
@@ -157,25 +152,29 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                           color: Colors.blueGrey)),
                   Expanded(
                     flex: 7,
-                    child: cashWithdrawCubit.withdrawalTransactions.isEmpty?const Text('You have note yet done any withdrawal!'):ListView.builder(
-                      itemCount: min(
-                          3, cashWithdrawCubit.withdrawalTransactions.length),
-                      itemBuilder: (context, index) {
-                        final transaction =
-                            cashWithdrawCubit.withdrawalTransactions[index];
+                    child: cashWithdrawCubit.withdrawalTransactions.isEmpty
+                        ? const Text('You have note yet done any withdrawal!')
+                        : ListView.builder(
+                            itemCount: min(
+                                3,
+                                cashWithdrawCubit
+                                    .withdrawalTransactions.length),
+                            itemBuilder: (context, index) {
+                              final transaction = cashWithdrawCubit
+                                  .withdrawalTransactions[index];
 
-                        return Card(
-                          child: ListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 10),
-                            title: Text(
-                                'You withdraw an amount of ₹ $transaction'),
-                            subtitle: Text(
-                                '${DateFormat('dd-MM-yyyy').format(DateTime.now())}  ${DateFormat('HH:mm:ss').format(DateTime.now())}'),
+                              return Card(
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  title: Text(
+                                      'You withdraw an amount of ₹ $transaction'),
+                                  subtitle: Text(
+                                      '${DateFormat('dd-MM-yyyy').format(DateTime.now())}  ${DateFormat('HH:mm:ss').format(DateTime.now())}'),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                   const Divider(),
                   const Text(

@@ -1,6 +1,5 @@
 import 'package:cash_withdrawer/features/cash_withdraw/bloc/cash_withdraw_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../data/db/database_helper.dart';
 import '../../../data/models/cash_model.dart';
 
@@ -8,13 +7,12 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
   final DatabaseHelper databaseHelper = DatabaseHelper();
   CashWithdrawCubit() : super(CashWithdrawInitialState());
 
-  List<int> withdrawalTransactions= [];
+  List<int> withdrawalTransactions = [];
 
   Future<Map<int, int>> performWithdrawal(
       int enteredAmount, List<int> noteCountList) async {
     final denominations = [2000, 1000, 500, 200, 100];
 
-    print('1');
     Map<int, int> result = {};
     int remainingAmount = enteredAmount;
 
@@ -28,10 +26,8 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
         remainingAmount -= denomination;
       }
       noteCountList[i] = notesAvailable;
-      print('2');
     }
     if (remainingAmount > 0) {
-      print('3');
       emit(CashWithdrawErrorState());
       return {0: 0};
     }
@@ -59,8 +55,6 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
       withdrawalTransactions.add(enteredAmount);
       emit(CashWithdrawSuccessState());
     }
-
-    print('result: ${result}');
     return result;
   }
 }
