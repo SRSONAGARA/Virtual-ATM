@@ -80,7 +80,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const CashTable()
+                CashTable(scrSize: MediaQuery.of(context).size.height/2.2)
               ],
             ),
           ),

@@ -25,6 +25,6 @@ class AppRoutes {
         CashTable.routeName: (_) => MultiBlocProvider(providers: [
               BlocProvider(create: (_) => CashTableCubit()),
               BlocProvider(create: (_) => CashInsertionCubit())
-            ], child: const CashTable())
+            ], child: const CashTable(scrSize: 200,))
       };
 }

@@ -7,8 +7,9 @@ import 'bloc/cash_table_state.dart';
 
 class CashTable extends StatefulWidget {
   static const String routeName = "/Cash-Table";
+  final double scrSize;
 
-  const CashTable({super.key});
+  const CashTable({super.key, required this.scrSize});
 
   @override
   State<CashTable> createState() => _CashTableState();
@@ -35,7 +36,8 @@ class _CashTableState extends State<CashTable> {
 
       cashTableCubit.fetchDenominationCount();
       final denominationCountList = cashTableCubit.denominationCountList;
-      return SingleChildScrollView(
+      return Container(
+        height: widget.scrSize,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -90,56 +92,49 @@ class _CashTableState extends State<CashTable> {
               ),
             ),
             const SizedBox(height: 10),
-            FittedBox(
-              child: cashList.isNotEmpty
-                  ? SizedBox(
-                      height: MediaQuery.of(context).size.height / 2,
-                      child: Card(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: DataTable(
-                            columns: const [
-                              DataColumn(label: Text('₹100')),
-                              DataColumn(label: Text('₹200')),
-                              DataColumn(label: Text('₹500')),
-                              DataColumn(label: Text('₹1000')),
-                              DataColumn(label: Text('₹2000')),
-                              DataColumn(label: Text('DateTime')),
-                            ],
-                            rows: cashList.map((cash) {
-                              final formattedTime =
-                                  DateFormat('HH:mm:ss').format(cash.dateTime!);
-                              final formattedDateTime =
-                                  '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
-                              return DataRow(cells: [
-                                DataCell(Text(
-                                  '${cash.hundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.twoHundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.fiveHundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.thousandRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.twoThousandRupeeNoteCount}',
-                                )),
-                                DataCell(Text(formattedDateTime)),
-                              ]);
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(
-                      height: 50, // Set the desired height for empty state
-                      child: Center(
-                        child: Text('No Cash History Available'),
-                      ),
+            SizedBox(
+              height: widget.scrSize - MediaQuery.of(context).size.height / 5,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: FittedBox(
+                  child: Card(
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('₹100')),
+                        DataColumn(label: Text('₹200')),
+                        DataColumn(label: Text('₹500')),
+                        DataColumn(label: Text('₹1000')),
+                        DataColumn(label: Text('₹2000')),
+                        DataColumn(label: Text('DateTime')),
+                      ],
+                      rows: cashList.map((cash) {
+                        final formattedTime =
+                            DateFormat('HH:mm:ss').format(cash.dateTime!);
+                        final formattedDateTime =
+                            '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
+                        return DataRow(cells: [
+                          DataCell(Text(
+                            '${cash.hundredRupeeNoteCount}',
+                          )),
+                          DataCell(Text(
+                            '${cash.twoHundredRupeeNoteCount}',
+                          )),
+                          DataCell(Text(
+                            '${cash.fiveHundredRupeeNoteCount}',
+                          )),
+                          DataCell(Text(
+                            '${cash.thousandRupeeNoteCount}',
+                          )),
+                          DataCell(Text(
+                            '${cash.twoThousandRupeeNoteCount}',
+                          )),
+                          DataCell(Text(formattedDateTime)),
+                        ]);
+                      }).toList(),
                     ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(
               height: 10,
