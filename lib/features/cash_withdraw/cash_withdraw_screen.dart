@@ -28,11 +28,13 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     super.initState();
     databaseHelper = DatabaseHelper();
     CashTableCubit cashTableCubit = BlocProvider.of<CashTableCubit>(context);
-    cashTableCubit.fetchData();
-    cashTableCubit.fetchDenominationCount();
     CashWithdrawCubit cashWithdrawCubit =
         BlocProvider.of<CashWithdrawCubit>(context);
+    cashTableCubit.fetchData();
+    cashTableCubit.fetchDenominationCount();
+
     cashWithdrawCubit.fetchWithdrawHistory();
+    cashWithdrawCubit.fetchWithdrawDenominationCount();
   }
 
   @override
@@ -66,7 +68,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         CashWithdrawCubit cashWithdrawCubit =
             BlocProvider.of<CashWithdrawCubit>(context);
         final withdrawalTransactions = cashWithdrawCubit.withdrawalTransactions;
-        print('withdrawalTransactions:$withdrawalTransactions');
+        final withdrawDenominationCount =
+            cashWithdrawCubit.withdrawDenominationCount;
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
@@ -105,7 +108,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                             child: TextField(
                               controller: amountToWithdraw,
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9]')),
                               ],
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
@@ -134,7 +138,10 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                           enteredAmount, noteCountList);
                                       await cashTableCubit
                                           .fetchDenominationCount();
-                                      await cashWithdrawCubit.fetchWithdrawHistory();
+                                      await cashWithdrawCubit
+                                          .fetchWithdrawDenominationCount();
+                                      await cashWithdrawCubit
+                                          .fetchWithdrawHistory();
                                       amountToWithdraw.clear();
                                     } else {
                                       showAlertDialog('Success',
@@ -171,7 +178,6 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                   withdrawalTransactions.reversed.toList();
                               if (index < reversedList.length) {
                                 final transaction = reversedList[index];
-                                print('transaction:$transaction');
                                 return Card(
                                   child: ListTile(
                                     contentPadding: const EdgeInsets.symmetric(
@@ -188,7 +194,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                   ),
                   const Divider(),
                   const Text(
-                    'Total Available Stocks:',
+                    'Available Stocks of each denominations:',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -197,7 +203,7 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    flex: 6,
+                    flex: 5,
                     child: SingleChildScrollView(
                       child: FittedBox(
                         child: Card(
@@ -229,6 +235,61 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                 )),
                               ]);
                             }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(),
+                  const Text(
+                    'Withdraw History:',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    flex: 6,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: FittedBox(
+                        child: Card(
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(label: Text('₹100')),
+                              DataColumn(label: Text('₹200')),
+                              DataColumn(label: Text('₹500')),
+                              DataColumn(label: Text('₹1000')),
+                              DataColumn(label: Text('₹2000')),
+                              DataColumn(label: Text('DateTime')),
+                            ],
+                            rows: withdrawDenominationCount.map((cash) {
+                              final formattedTime = DateFormat('HH:mm:ss')
+                                  .format(cash.dateTime!);
+                              final formattedDateTime =
+                                  '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
+                              return DataRow(cells: [
+                                DataCell(Text(
+                                  '${cash.hundredRupeeNoteCount}',
+                                )),
+                                DataCell(Text(
+                                  '${cash.twoHundredRupeeNoteCount}',
+                                )),
+                                DataCell(Text(
+                                  '${cash.fiveHundredRupeeNoteCount}',
+                                )),
+                                DataCell(Text(
+                                  '${cash.thousandRupeeNoteCount}',
+                                )),
+                                DataCell(Text(
+                                  '${cash.twoThousandRupeeNoteCount}',
+                                )),
+                                DataCell(Text(formattedDateTime)),
+                              ]);
+                            }).toList()
                           ),
                         ),
                       ),

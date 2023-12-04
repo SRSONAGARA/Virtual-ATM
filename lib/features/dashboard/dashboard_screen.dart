@@ -10,8 +10,8 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cash Add-WithDrawer',
-          // style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Cash Add-WithDrawer',
         ),
         // backgroundColor: Colors.blueGrey,
       ),

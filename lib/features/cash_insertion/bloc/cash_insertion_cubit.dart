@@ -62,8 +62,8 @@ class CashInsertionCubit extends Cubit<CashInsertionState> {
       return noteCounts;
     }
 
-    final cashList = await databaseHelper.getCashList();
-    print('cashList : $cashList');
+    final cashList = await databaseHelper.getInsertionHistory() +
+        await databaseHelper.getWithdrawalHistory();
 
     final totalNoteCounts = calculateTotalNoteCount(cashList..add(cashModel));
 

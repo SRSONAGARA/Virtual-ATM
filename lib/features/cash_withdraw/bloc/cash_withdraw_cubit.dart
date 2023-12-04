@@ -9,6 +9,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
   CashWithdrawCubit() : super(CashWithdrawInitialState());
 
   List<WithdrawHistoryModel> withdrawalTransactions = [];
+  List<CashModel> withdrawDenominationCount = [];
 
   Future<Map<int, int>> performWithdrawal(
       int enteredAmount, List<int> noteCountList) async {
@@ -55,11 +56,10 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
 
       final withdrawalDateTime = DateTime.now();
 
-      final withdrawHistoryModel= WithdrawHistoryModel(
-        withdrawnAmount: enteredAmount,
-        dateTime: withdrawalDateTime
-      );
+      final withdrawHistoryModel = WithdrawHistoryModel(
+          withdrawnAmount: enteredAmount, dateTime: withdrawalDateTime);
       await databaseHelper.insertIntoWithdrawHistory(withdrawHistoryModel);
+      await databaseHelper.getWithdrawalHistory();
 
       emit(CashWithdrawSuccessState());
     }
@@ -73,6 +73,16 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
     } catch (error) {
       print('Error fetching data: $error');
       emit(HistoryFetchedError());
+    }
+  }
+
+  Future<void> fetchWithdrawDenominationCount() async {
+    try {
+      withdrawDenominationCount = await databaseHelper.getWithdrawalHistory();
+      emit(WithdrawHistorySuccess());
+    } catch (error) {
+      print('Error fetching data: $error');
+      emit(WithdrawHistoryError());
     }
   }
 }

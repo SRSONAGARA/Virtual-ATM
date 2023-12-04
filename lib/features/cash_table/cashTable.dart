@@ -36,7 +36,7 @@ class _CashTableState extends State<CashTable> {
 
       cashTableCubit.fetchDenominationCount();
       final denominationCountList = cashTableCubit.denominationCountList;
-      return Container(
+      return SizedBox(
         height: widget.scrSize,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +84,7 @@ class _CashTableState extends State<CashTable> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Cash History:',
+              'Insertion History:',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-
 import '../models/cash_model.dart';
 import '../models/withdraw_history_model.dart';
 
@@ -43,12 +42,36 @@ class DatabaseHelper {
     return cashModel;
   }
 
-  Future<List<CashModel>> getCashList() async {
+  Future<List<CashModel>> getInsertionHistory() async {
     var databaseClient = await database;
     final List<Map<String, Object?>> queryResult =
         await databaseClient!.query('cash');
 
-    return queryResult.map((e) => CashModel.fromMap(e)).toList();
+    return queryResult
+        .map((e) => CashModel.fromMap(e))
+        .where((cashModel) =>
+            cashModel.hundredRupeeNoteCount! >= 0 &&
+            cashModel.twoHundredRupeeNoteCount! >= 0 &&
+            cashModel.fiveHundredRupeeNoteCount! >= 0 &&
+            cashModel.thousandRupeeNoteCount! >= 0 &&
+            cashModel.twoThousandRupeeNoteCount! >= 0)
+        .toList();
+  }
+
+  Future<List<CashModel>> getWithdrawalHistory() async {
+    var databaseClient = await database;
+    final List<Map<String, Object?>> queryResult =
+        await databaseClient!.query('cash');
+
+    return queryResult
+        .map((e) => CashModel.fromMap(e))
+        .where((cashModel) =>
+            cashModel.hundredRupeeNoteCount! < 0 ||
+            cashModel.twoHundredRupeeNoteCount! < 0 ||
+            cashModel.fiveHundredRupeeNoteCount! < 0 ||
+            cashModel.thousandRupeeNoteCount! < 0 ||
+            cashModel.twoThousandRupeeNoteCount! < 0)
+        .toList();
   }
 
   Future<DenominationCountModel> insertIntoDenominationCount(
@@ -84,8 +107,6 @@ class DatabaseHelper {
   }
 
   Future<void> updateDatabase(Map<int, int> updatedNoteCounts) async {
-    var databaseClient = await database;
-
     List<DenominationCountModel> existingDenominationCounts =
         await getDenominationCountList();
 
@@ -112,7 +133,6 @@ class DatabaseHelper {
         thousandRupeeTotalNoteCount: updatedCountForThousand,
         twoThousandRupeeTotalNoteCount: updatedCountForTowThousand);
 
-    print('updatedDenominationCount: $updatedDenominationCount');
     await insertIntoDenominationCount(updatedDenominationCount);
   }
 
@@ -123,18 +143,19 @@ class DatabaseHelper {
 
     return queryResult.map((e) => DenominationCountModel.fromMap(e)).toList();
   }
-  
-  Future<WithdrawHistoryModel> insertIntoWithdrawHistory(WithdrawHistoryModel withdrawHistoryModel)async{
+
+  Future<WithdrawHistoryModel> insertIntoWithdrawHistory(
+      WithdrawHistoryModel withdrawHistoryModel) async {
     var databaseClient = await database;
-    await databaseClient!.insert('withdrawalHistory', withdrawHistoryModel.toMap());
-    print('insertIntoWithdrawHistory');
+    await databaseClient!
+        .insert('withdrawalHistory', withdrawHistoryModel.toMap());
     return withdrawHistoryModel;
   }
 
   Future<List<WithdrawHistoryModel>> getWithdrawList() async {
     var databaseClient = await database;
     final List<Map<String, Object?>> queryResult =
-    await databaseClient!.query('withdrawalHistory');
+        await databaseClient!.query('withdrawalHistory');
 
     return queryResult.map((e) => WithdrawHistoryModel.fromMap(e)).toList();
   }

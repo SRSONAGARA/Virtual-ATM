@@ -13,7 +13,7 @@ class CashTableCubit extends Cubit<CashTableState>{
 
   Future<void> fetchData() async {
     try {
-      cashList = await _databaseHelper.getCashList();
+      cashList = await _databaseHelper.getInsertionHistory();
       emit(DataFetchedSuccessState());
     } catch (error) {
       print('Error fetching data: $error');
