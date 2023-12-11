@@ -21,11 +21,11 @@ class DatabaseHelper {
   initDatabase() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, 'cash.db');
-    var database = await openDatabase(path, version: 1, onCreate: _onCreate);
+    var database = await openDatabase(path, version: 1, onCreate: onCreate);
     return database;
   }
 
-  _onCreate(Database database, int version) async {
+  onCreate(Database database, int version) async {
     await database.execute(
         "CREATE TABLE cash (id INTEGER PRIMARY KEY AUTOINCREMENT, hundredRupeeNoteCount INTEGER, twoHundredRupeeNoteCount INTEGER, fiveHundredRupeeNoteCount INTEGER, thousandRupeeNoteCount INTEGER, twoThousandRupeeNoteCount INTEGER, dateTime TEXT)");
 
@@ -36,7 +36,7 @@ class DatabaseHelper {
         "CREATE TABLE withdrawalHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, withdrawnAmount INTEGER, dateTime TEXT)");
   }
 
-  Future<CashModel> insert(CashModel cashModel) async {
+  Future<CashModel> insertIntoCashTable(CashModel cashModel) async {
     var databaseClient = await database;
     await databaseClient!.insert('cash', cashModel.toMap());
     return cashModel;

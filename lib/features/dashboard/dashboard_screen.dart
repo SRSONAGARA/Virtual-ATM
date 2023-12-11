@@ -13,7 +13,6 @@ class DashboardScreen extends StatelessWidget {
         title: const Text(
           'Cash Add-WithDrawer',
         ),
-        // backgroundColor: Colors.blueGrey,
       ),
       body: Center(
         child: Column(

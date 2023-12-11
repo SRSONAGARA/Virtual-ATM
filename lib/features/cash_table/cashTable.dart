@@ -34,7 +34,6 @@ class _CashTableState extends State<CashTable> {
           BlocProvider.of<CashTableCubit>(context);
       final cashList = cashTableCubit.cashList;
 
-      cashTableCubit.fetchDenominationCount();
       final denominationCountList = cashTableCubit.denominationCountList;
       return SizedBox(
         height: widget.scrSize,

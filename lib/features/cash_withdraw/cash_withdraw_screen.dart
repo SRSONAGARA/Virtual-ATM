@@ -33,8 +33,8 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
     cashTableCubit.fetchData();
     cashTableCubit.fetchDenominationCount();
 
-    cashWithdrawCubit.fetchWithdrawHistory();
-    cashWithdrawCubit.fetchWithdrawDenominationCount();
+    cashWithdrawCubit.fetchWithdrawTransaction();
+    cashWithdrawCubit.fetchWithdrawDenominationCountHistory();
   }
 
   @override
@@ -139,9 +139,9 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                                       await cashTableCubit
                                           .fetchDenominationCount();
                                       await cashWithdrawCubit
-                                          .fetchWithdrawDenominationCount();
+                                          .fetchWithdrawDenominationCountHistory();
                                       await cashWithdrawCubit
-                                          .fetchWithdrawHistory();
+                                          .fetchWithdrawTransaction();
                                       amountToWithdraw.clear();
                                     } else {
                                       showAlertDialog('Success',
@@ -258,39 +258,38 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
                       child: FittedBox(
                         child: Card(
                           child: DataTable(
-                            columns: const [
-                              DataColumn(label: Text('₹100')),
-                              DataColumn(label: Text('₹200')),
-                              DataColumn(label: Text('₹500')),
-                              DataColumn(label: Text('₹1000')),
-                              DataColumn(label: Text('₹2000')),
-                              DataColumn(label: Text('DateTime')),
-                            ],
-                            rows: withdrawDenominationCount.map((cash) {
-                              final formattedTime = DateFormat('HH:mm:ss')
-                                  .format(cash.dateTime!);
-                              final formattedDateTime =
-                                  '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
-                              return DataRow(cells: [
-                                DataCell(Text(
-                                  '${cash.hundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.twoHundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.fiveHundredRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.thousandRupeeNoteCount}',
-                                )),
-                                DataCell(Text(
-                                  '${cash.twoThousandRupeeNoteCount}',
-                                )),
-                                DataCell(Text(formattedDateTime)),
-                              ]);
-                            }).toList()
-                          ),
+                              columns: const [
+                                DataColumn(label: Text('₹100')),
+                                DataColumn(label: Text('₹200')),
+                                DataColumn(label: Text('₹500')),
+                                DataColumn(label: Text('₹1000')),
+                                DataColumn(label: Text('₹2000')),
+                                DataColumn(label: Text('DateTime')),
+                              ],
+                              rows: withdrawDenominationCount.map((cash) {
+                                final formattedTime = DateFormat('HH:mm:ss')
+                                    .format(cash.dateTime!);
+                                final formattedDateTime =
+                                    '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
+                                return DataRow(cells: [
+                                  DataCell(Text(
+                                    '${cash.hundredRupeeNoteCount}',
+                                  )),
+                                  DataCell(Text(
+                                    '${cash.twoHundredRupeeNoteCount}',
+                                  )),
+                                  DataCell(Text(
+                                    '${cash.fiveHundredRupeeNoteCount}',
+                                  )),
+                                  DataCell(Text(
+                                    '${cash.thousandRupeeNoteCount}',
+                                  )),
+                                  DataCell(Text(
+                                    '${cash.twoThousandRupeeNoteCount}',
+                                  )),
+                                  DataCell(Text(formattedDateTime)),
+                                ]);
+                              }).toList()),
                         ),
                       ),
                     ),

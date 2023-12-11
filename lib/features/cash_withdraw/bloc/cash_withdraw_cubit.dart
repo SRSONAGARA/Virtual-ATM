@@ -52,7 +52,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
             negativeResult.containsKey(2000) ? negativeResult[2000] ?? 0 : 0,
         dateTime: DateTime.now(),
       );
-      await databaseHelper.insert(cashModel);
+      await databaseHelper.insertIntoCashTable(cashModel);
 
       final withdrawalDateTime = DateTime.now();
 
@@ -66,7 +66,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
     return result;
   }
 
-  Future<void> fetchWithdrawHistory() async {
+  Future<void> fetchWithdrawTransaction() async {
     try {
       withdrawalTransactions = await databaseHelper.getWithdrawList();
       emit(HistoryFetchedSuccess());
@@ -76,7 +76,7 @@ class CashWithdrawCubit extends Cubit<CashWithdrawState> {
     }
   }
 
-  Future<void> fetchWithdrawDenominationCount() async {
+  Future<void> fetchWithdrawDenominationCountHistory() async {
     try {
       withdrawDenominationCount = await databaseHelper.getWithdrawalHistory();
       emit(WithdrawHistorySuccess());

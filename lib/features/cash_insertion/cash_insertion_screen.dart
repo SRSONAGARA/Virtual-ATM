@@ -88,11 +88,11 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
       );
     }, listener: (context, state) {
       if (state is ControllerValueEmptyState) {
-        _showAlertDialog('Empty', 'Please enter values.');
+        showAlertDialog('Empty', 'Please enter values.');
       } else if (state is DataInsertionSuccessState) {
-        _showAlertDialog('Successful', 'Data Inserted Successfully!.');
+        showAlertDialog('Successful', 'Data Inserted Successfully!.');
       } else {
-        _showAlertDialog('Error', 'Data note inserted.');
+        showAlertDialog('Error', 'Data note inserted.');
       }
     });
   }
@@ -126,7 +126,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     );
   }
 
-  void _showAlertDialog(String title, String message) {
+  void showAlertDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -135,7 +135,7 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop();
             },
             child: const Text('OK'),
           ),

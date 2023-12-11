@@ -31,11 +31,11 @@ class CashInsertionCubit extends Cubit<CashInsertionState> {
     }
 
     final cashModel = CashModel(
-      hundredRupeeNoteCount: _getValue(hundredController),
-      twoHundredRupeeNoteCount: _getValue(twoHundredController),
-      fiveHundredRupeeNoteCount: _getValue(fiveHundredController),
-      thousandRupeeNoteCount: _getValue(thousandController),
-      twoThousandRupeeNoteCount: _getValue(twoThousandController),
+      hundredRupeeNoteCount: getValue(hundredController),
+      twoHundredRupeeNoteCount: getValue(twoHundredController),
+      fiveHundredRupeeNoteCount: getValue(fiveHundredController),
+      thousandRupeeNoteCount: getValue(thousandController),
+      twoThousandRupeeNoteCount: getValue(twoThousandController),
       dateTime: DateTime.now(),
     );
 
@@ -76,7 +76,7 @@ class CashInsertionCubit extends Cubit<CashInsertionState> {
     );
 
     try {
-      await databaseHelper.insert(cashModel);
+      await databaseHelper.insertIntoCashTable(cashModel);
       hundredController.clear();
       twoHundredController.clear();
       fiveHundredController.clear();
@@ -91,7 +91,7 @@ class CashInsertionCubit extends Cubit<CashInsertionState> {
     }
   }
 
-  int _getValue(TextEditingController controller) {
+  int getValue(TextEditingController controller) {
     return int.tryParse(controller.text) ?? 0;
   }
 }
