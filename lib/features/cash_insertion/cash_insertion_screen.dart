@@ -31,65 +31,63 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
         builder: (context, state) {
       CashInsertionCubit cashInsertionCubit =
           BlocProvider.of<CashInsertionCubit>(context);
-      return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blueGrey,
-            iconTheme: const IconThemeData(color: Colors.white),
-            title: const Text(
-              'Add Money',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.white),
-            ),
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blueGrey,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: const Text(
+            'Add Money',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.white),
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 15),
-                const Text(
-                  'Enter the number of Notes you want to add',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 15),
+              const Text(
+                'Enter the number of Notes you want to add',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    children: [
+                      buildTextField(
+                          '₹100  ', cashInsertionCubit.hundredController),
+                      buildTextField(
+                          '₹200  ', cashInsertionCubit.twoHundredController),
+                      buildTextField(
+                          '₹500  ', cashInsertionCubit.fiveHundredController),
+                      buildTextField(
+                          '₹1000', cashInsertionCubit.thousandController),
+                      buildTextField(
+                          '₹2000', cashInsertionCubit.twoThousandController),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+                        onPressed: () async {
+                          await cashInsertionCubit.addCash();
+                          await cashTable.fetchData();
+                          await cashTable.fetchDenominationCount();
+                        },
+                        child: const Text('Add',style: TextStyle(color: Colors.white),),
+                      ),
+                    ],
                   ),
                 ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      children: [
-                        buildTextField(
-                            '₹100  ', cashInsertionCubit.hundredController),
-                        buildTextField(
-                            '₹200  ', cashInsertionCubit.twoHundredController),
-                        buildTextField(
-                            '₹500  ', cashInsertionCubit.fiveHundredController),
-                        buildTextField(
-                            '₹1000', cashInsertionCubit.thousandController),
-                        buildTextField(
-                            '₹2000', cashInsertionCubit.twoThousandController),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
-                          onPressed: () async {
-                            await cashInsertionCubit.addCash();
-                            await cashTable.fetchData();
-                            await cashTable.fetchDenominationCount();
-                          },
-                          child: const Text('Add',style: TextStyle(color: Colors.white),),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CashTable(scrSize: MediaQuery.of(context).size.height / 2.2)
-              ],
-            ),
+              ),
+              const SizedBox(height: 10),
+              CashTable(scrSize: MediaQuery.of(context).size.height / 2.2)
+            ],
           ),
         ),
       );
