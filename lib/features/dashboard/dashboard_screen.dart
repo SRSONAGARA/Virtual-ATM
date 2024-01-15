@@ -10,24 +10,56 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blueGrey,
         title: const Text(
-          'Cash Add-WithDrawer',
+          'Virtual ATM Machine', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,color: Colors.white),
         ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, CashInsertionScreen.routeName);
-                },
-                child: const Text('Insert Cash')),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, CashWithdrawScreen.routeName);
-                },
-                child: const Text('Withdraw Cash')),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap: (){
+                        Navigator.pushNamed(context, CashInsertionScreen.routeName);
+                      },
+                      child: Card(
+                        child: Image.asset('assets/insert_cash.png',height: 170),
+                      ),
+                    ),
+                    const SizedBox(height: 10,),
+                    const Text('Insert Cash', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)
+                  ],
+                ),
+              ),
+            ),
+            const Divider(),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap: (){
+                        Navigator.pushNamed(context, CashWithdrawScreen.routeName);
+                      },
+                      child: Card(
+                        child: Image.asset('assets/withdraw_cash.png',height: 170),
+                      ),
+                    ),
+                    const SizedBox(height: 10,),
+                    const Text('Withdraw cash', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -34,8 +34,14 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
       return SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.blueGrey,
+            iconTheme: const IconThemeData(color: Colors.white),
             title: const Text(
               'Add Money',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.white),
             ),
           ),
           body: SingleChildScrollView(
@@ -57,30 +63,31 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Column(
                       children: [
-                        _buildTextField(
+                        buildTextField(
                             '₹100  ', cashInsertionCubit.hundredController),
-                        _buildTextField(
+                        buildTextField(
                             '₹200  ', cashInsertionCubit.twoHundredController),
-                        _buildTextField(
+                        buildTextField(
                             '₹500  ', cashInsertionCubit.fiveHundredController),
-                        _buildTextField(
+                        buildTextField(
                             '₹1000', cashInsertionCubit.thousandController),
-                        _buildTextField(
+                        buildTextField(
                             '₹2000', cashInsertionCubit.twoThousandController),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
                           onPressed: () async {
                             await cashInsertionCubit.addCash();
                             await cashTable.fetchData();
                             await cashTable.fetchDenominationCount();
                           },
-                          child: const Text('Add'),
+                          child: const Text('Add',style: TextStyle(color: Colors.white),),
                         ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                CashTable(scrSize: MediaQuery.of(context).size.height/2.2)
+                CashTable(scrSize: MediaQuery.of(context).size.height / 2.2)
               ],
             ),
           ),
@@ -88,16 +95,16 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
       );
     }, listener: (context, state) {
       if (state is ControllerValueEmptyState) {
-        showAlertDialog('Empty', 'Please enter values.');
+       showCustomSnackBar('Please enter values.');
       } else if (state is DataInsertionSuccessState) {
-        showAlertDialog('Successful', 'Data Inserted Successfully!.');
+        showCustomSnackBar('Data Inserted Successfully!.');
       } else {
-        showAlertDialog('Error', 'Data note inserted.');
+        showCustomSnackBar('Data note inserted.');
       }
     });
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget buildTextField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
@@ -126,21 +133,8 @@ class _CashInsertionScreenState extends State<CashInsertionScreen> {
     );
   }
 
-  void showAlertDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  void showCustomSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }

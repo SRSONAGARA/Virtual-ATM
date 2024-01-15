@@ -70,261 +70,252 @@ class _CashWithdrawScreenState extends State<CashWithdrawScreen> {
         final withdrawalTransactions = cashWithdrawCubit.withdrawalTransactions;
         final withdrawDenominationCount =
             cashWithdrawCubit.withdrawDenominationCount;
-        return SafeArea(
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'Withdraw Money',
-              ),
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blueGrey,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              'Withdraw Money',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.white),
             ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 15),
-                  Text(
-                    'Total available Balance: ₹$totalValue',
-                    style: const TextStyle(
-                      fontSize: 20,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 15),
+                Text(
+                  'Total available Balance: ₹$totalValue',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Enter the Amount you wish to withdraw.',
+                  style: TextStyle(
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
+                      color: Colors.blueGrey),
+                ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: amountToWithdraw,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]')),
+                            ],
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              prefixText: '₹ ',
+                              border: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      width: 2, color: Colors.blueGrey),
+                                  borderRadius: BorderRadius.circular(3)),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 0),
+                              hintText: 'Enter value',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+                            onPressed: () async {
+                              final enteredAmountStr = amountToWithdraw.text;
+                              final enteredAmount =
+                                  int.tryParse(enteredAmountStr) ?? 0;
+
+                              if (enteredAmount != 0) {
+                                if (enteredAmount <= totalValue) {
+                                  if (enteredAmount % 100 == 0) {
+                                    await cashWithdrawCubit.performWithdrawal(
+                                        enteredAmount, noteCountList);
+                                    await cashTableCubit
+                                        .fetchDenominationCount();
+                                    await cashWithdrawCubit
+                                        .fetchWithdrawDenominationCountHistory();
+                                    await cashWithdrawCubit
+                                        .fetchWithdrawTransaction();
+                                    amountToWithdraw.clear();
+                                  } else {
+                                    showCustomSnackBar(
+                                        'Amount should be a multiple of 100');
+                                  }
+                                } else {
+                                  showCustomSnackBar('Insufficient balance');
+                                }
+                              } else {
+                                showCustomSnackBar(
+                                    'Please enter a valid amount');
+                              }
+                            },
+                            child: const Text('Withdraw',style: TextStyle(color: Colors.white),))
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Enter the Amount you wish to withdraw.',
+                ),
+                const Divider(),
+                const Text('Recent Transaction',
                     style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueGrey),
+                        color: Colors.blueGrey)),
+                Expanded(
+                  flex: 7,
+                  child: withdrawalTransactions.isEmpty
+                      ? const Text('You have note yet done any withdrawal transaction!')
+                      : ListView.builder(
+                          itemCount: min(3, withdrawalTransactions.length),
+                          itemBuilder: (context, index) {
+                            final reversedList =
+                                withdrawalTransactions.reversed.toList();
+                            if (index < reversedList.length) {
+                              final transaction = reversedList[index];
+                              return Card(
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  title: Text(
+                                      'You withdraw an amount of ₹ ${transaction.withdrawnAmount}'),
+                                  subtitle: Text(
+                                      '${DateFormat('dd-MM-yyyy').format(transaction.dateTime ?? DateTime.now())}  ${DateFormat('HH:mm:ss').format(transaction.dateTime ?? DateTime.now())}'),
+                                ),
+                              );
+                            }
+                            return null;
+                          },
+                        ),
+                ),
+                const Divider(),
+                const Text(
+                  'Available Stocks of each denominations:',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey,
                   ),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: amountToWithdraw,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9]')),
-                              ],
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                prefixText: '₹ ',
-                                border: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                        width: 2, color: Colors.blueGrey),
-                                    borderRadius: BorderRadius.circular(3)),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 0),
-                                hintText: 'Enter value',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          ElevatedButton(
-                              onPressed: () async {
-                                final enteredAmountStr = amountToWithdraw.text;
-                                final enteredAmount =
-                                    int.tryParse(enteredAmountStr) ?? 0;
-
-                                if (enteredAmount != 0) {
-                                  if (enteredAmount <= totalValue) {
-                                    if (enteredAmount % 100 == 0) {
-                                      await cashWithdrawCubit.performWithdrawal(
-                                          enteredAmount, noteCountList);
-                                      await cashTableCubit
-                                          .fetchDenominationCount();
-                                      await cashWithdrawCubit
-                                          .fetchWithdrawDenominationCountHistory();
-                                      await cashWithdrawCubit
-                                          .fetchWithdrawTransaction();
-                                      amountToWithdraw.clear();
-                                    } else {
-                                      showAlertDialog('Success',
-                                          'Amount should be a multiple of 100');
-                                    }
-                                  } else {
-                                    showAlertDialog(
-                                        'Error', 'Insufficient balance');
-                                  }
-                                } else {
-                                  showAlertDialog(
-                                      'Error', 'Please enter a valid amount');
-                                }
-                              },
-                              child: const Text('Withdraw'))
-                        ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  flex: 5,
+                  child: SingleChildScrollView(
+                    child: FittedBox(
+                      child: Card(
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Text('₹100')),
+                            DataColumn(label: Text('₹200')),
+                            DataColumn(label: Text('₹500')),
+                            DataColumn(label: Text('₹1000')),
+                            DataColumn(label: Text('₹2000')),
+                          ],
+                          rows: denominationCountList.map((denominationCount) {
+                            return DataRow(cells: [
+                              DataCell(Text(
+                                '${denominationCount.hundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.twoHundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.fiveHundredRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.thousandRupeeTotalNoteCount}',
+                              )),
+                              DataCell(Text(
+                                '${denominationCount.twoThousandRupeeTotalNoteCount}',
+                              )),
+                            ]);
+                          }).toList(),
+                        ),
                       ),
                     ),
                   ),
-                  const Divider(),
-                  const Text('Recent Transaction',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey)),
-                  Expanded(
-                    flex: 7,
-                    child: withdrawalTransactions.isEmpty
-                        ? const Text('You have note yet done any withdrawal!')
-                        : ListView.builder(
-                            itemCount: min(3, withdrawalTransactions.length),
-                            itemBuilder: (context, index) {
-                              final reversedList =
-                                  withdrawalTransactions.reversed.toList();
-                              if (index < reversedList.length) {
-                                final transaction = reversedList[index];
-                                return Card(
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    title: Text(
-                                        'You withdraw an amount of ₹ ${transaction.withdrawnAmount}'),
-                                    subtitle: Text(
-                                        '${DateFormat('dd-MM-yyyy').format(transaction.dateTime ?? DateTime.now())}  ${DateFormat('HH:mm:ss').format(transaction.dateTime ?? DateTime.now())}'),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
+                ),
+                const SizedBox(height: 10),
+                const Divider(),
+                const Text(
+                  'Withdraw History:',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey,
                   ),
-                  const Divider(),
-                  const Text(
-                    'Available Stocks of each denominations:',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    flex: 5,
-                    child: SingleChildScrollView(
-                      child: FittedBox(
-                        child: Card(
-                          child: DataTable(
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  flex: 6,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: FittedBox(
+                      child: Card(
+                        child: DataTable(
                             columns: const [
                               DataColumn(label: Text('₹100')),
                               DataColumn(label: Text('₹200')),
                               DataColumn(label: Text('₹500')),
                               DataColumn(label: Text('₹1000')),
                               DataColumn(label: Text('₹2000')),
+                              DataColumn(label: Text('DateTime')),
                             ],
-                            rows:
-                                denominationCountList.map((denominationCount) {
+                            rows: withdrawDenominationCount.map((cash) {
+                              final formattedTime =
+                                  DateFormat('HH:mm:ss').format(cash.dateTime!);
+                              final formattedDateTime =
+                                  '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
                               return DataRow(cells: [
                                 DataCell(Text(
-                                  '${denominationCount.hundredRupeeTotalNoteCount}',
+                                  '${cash.hundredRupeeNoteCount}',
                                 )),
                                 DataCell(Text(
-                                  '${denominationCount.twoHundredRupeeTotalNoteCount}',
+                                  '${cash.twoHundredRupeeNoteCount}',
                                 )),
                                 DataCell(Text(
-                                  '${denominationCount.fiveHundredRupeeTotalNoteCount}',
+                                  '${cash.fiveHundredRupeeNoteCount}',
                                 )),
                                 DataCell(Text(
-                                  '${denominationCount.thousandRupeeTotalNoteCount}',
+                                  '${cash.thousandRupeeNoteCount}',
                                 )),
                                 DataCell(Text(
-                                  '${denominationCount.twoThousandRupeeTotalNoteCount}',
+                                  '${cash.twoThousandRupeeNoteCount}',
                                 )),
+                                DataCell(Text(formattedDateTime)),
                               ]);
-                            }).toList(),
-                          ),
-                        ),
+                            }).toList()),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Divider(),
-                  const Text(
-                    'Withdraw History:',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    flex: 6,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: FittedBox(
-                        child: Card(
-                          child: DataTable(
-                              columns: const [
-                                DataColumn(label: Text('₹100')),
-                                DataColumn(label: Text('₹200')),
-                                DataColumn(label: Text('₹500')),
-                                DataColumn(label: Text('₹1000')),
-                                DataColumn(label: Text('₹2000')),
-                                DataColumn(label: Text('DateTime')),
-                              ],
-                              rows: withdrawDenominationCount.map((cash) {
-                                final formattedTime = DateFormat('HH:mm:ss')
-                                    .format(cash.dateTime!);
-                                final formattedDateTime =
-                                    '${DateFormat('dd-MM-yyyy').format(cash.dateTime!)} $formattedTime';
-                                return DataRow(cells: [
-                                  DataCell(Text(
-                                    '${cash.hundredRupeeNoteCount}',
-                                  )),
-                                  DataCell(Text(
-                                    '${cash.twoHundredRupeeNoteCount}',
-                                  )),
-                                  DataCell(Text(
-                                    '${cash.fiveHundredRupeeNoteCount}',
-                                  )),
-                                  DataCell(Text(
-                                    '${cash.thousandRupeeNoteCount}',
-                                  )),
-                                  DataCell(Text(
-                                    '${cash.twoThousandRupeeNoteCount}',
-                                  )),
-                                  DataCell(Text(formattedDateTime)),
-                                ]);
-                              }).toList()),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
       }, listener: (context, state) {
         if (state is CashWithdrawSuccessState) {
-          showAlertDialog('Success', 'Amount successfully Withdrawn!');
+          showCustomSnackBar('Amount successfully Withdrawn!');
         } else if (state is CashWithdrawErrorState) {
-          showAlertDialog('Error',
+          showCustomSnackBar(
               'Unable to dispense requested amount with available notes');
         }
       });
     });
   }
 
-  void showAlertDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  void showCustomSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }
